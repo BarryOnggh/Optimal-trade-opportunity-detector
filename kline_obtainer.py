@@ -26,7 +26,7 @@ def get_binance_klines(symbol, interval, start_time, end_time):
 
 #prevent top level code from being executed
 if __name__ == "__main__":
-    # Example usage
+    # Example
     symbol = 'CAKEUSDT'
     interval = '1h'
     start_time = datetime(2024, 6, 1, tzinfo=timezone.utc)

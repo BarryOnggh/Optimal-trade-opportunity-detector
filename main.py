@@ -1,6 +1,8 @@
-import pandas as pd
 from kline_obtainer import get_binance_klines
 from datetime import datetime, timezone
+import pandas as pd
+import numpy as np
+from scipy.signal import argrelextrema
 
 #data for running program
 symbol = 'AAVEUSDT'
@@ -9,25 +11,19 @@ start_time = datetime(2024, 6, 1, tzinfo=timezone.utc)
 end_time = datetime(2024, 6, 2, tzinfo=timezone.utc) 
 
 data = get_binance_klines(symbol, interval, start_time, end_time)
-print(data)
-#print(data.head())
 
+#find maxima and minima(maximum and minimum point)
 
-#pandas stuff
-high = data["high"]
-low = data["low"]
-close = data["close"]
+data['Min'] = data['low'][argrelextrema(data['low'].values, np.less_equal, order=5)[0]]
+data['Max'] = data['high'][argrelextrema(data['high'].values, np.greater_equal, order=5)[0]]
 
-# Find the rolling maximum and minimum for the high and low prices
-rolling_max = high.rolling(24).max().mean()
-rolling_min = low.rolling(24).min().mean()
+#removing null values
+support = data['Min'].dropna().values
+resistance = data['Max'].dropna().values
 
-# Identify the support levels as the rolling minimum
-support = rolling_min
+# Group into zones 
+buffer_percentage = 0.02
+support_zones = [(level * (1 - buffer_percentage), level * (1 + buffer_percentage)) for level in support]
+resistance_zones = [(level * (1 - buffer_percentage), level * (1 + buffer_percentage)) for level in resistance]
 
-# Identify the resistance levels as the rolling maximum
-resistance = rolling_max
-
-# Print the support and resistance levels
-print("Support levels:", support)
-print("Resistance levels:", resistance)
+print(support_zones)
