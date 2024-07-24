@@ -11,6 +11,8 @@ def to_milliseconds(dt):
 
 #pull data from api
 def get_binance_klines(symbol, interval, start_time, end_time):
+    start_time_ms = to_milliseconds(start_time)
+    end_time_ms = to_milliseconds(end_time)
     url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&startTime={start_time_ms}&endTime={end_time_ms}"
     response = requests.get(url)
     data = json.loads(response.text)
@@ -22,15 +24,14 @@ def get_binance_klines(symbol, interval, start_time, end_time):
     df = df[['open', 'high', 'low', 'close', 'volume']].astype(float)
     return df
 
-# Example usage
-symbol = 'CAKEUSDT'
-interval = '1h'
-start_time = datetime(2024, 6, 1, tzinfo=timezone.utc)
-end_time = datetime(2024, 6, 2, tzinfo=timezone.utc)  
+#prevent top level code from being executed
+if __name__ == "__main__":
+    # Example usage
+    symbol = 'CAKEUSDT'
+    interval = '1h'
+    start_time = datetime(2024, 6, 1, tzinfo=timezone.utc)
+    end_time = datetime(2024, 6, 2, tzinfo=timezone.utc)  
 
-start_time_ms = to_milliseconds(start_time)
-end_time_ms = to_milliseconds(end_time)
 
-
-data = get_binance_klines(symbol, interval, start_time, end_time)
-print(data.head())
+    data = get_binance_klines(symbol, interval, start_time, end_time)
+    print(data.head())
